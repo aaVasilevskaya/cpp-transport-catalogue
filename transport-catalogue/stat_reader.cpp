@@ -1,23 +1,5 @@
 #include "stat_reader.h"
 
-#include <iostream>
-#include <iomanip>
-
-
-void ParseAndPrintStat(const Catalogue::TransportCatalogue& tansport_catalogue, std::string_view request,
-                       std::ostream& output) {
-    
-    auto command_description = ParseRequestDescription(request);
-    
-    output<< command_description.command << " " << command_description.id << ": ";
-
-    if(command_description.command == "Bus"){
-        PrintBusInfo(tansport_catalogue, command_description.id, output);        
-    }else if(command_description.command == "Stop"){
-        PrintStopInfo(tansport_catalogue, command_description.id, output);
-    }
-}
-
 RequestDescription ParseRequestDescription(std::string_view line) {
     auto colon_pos = line.find_last_not_of(' ') + 1;
 
@@ -35,10 +17,40 @@ RequestDescription ParseRequestDescription(std::string_view line) {
             std::string(line.substr(not_space, colon_pos - not_space))};
 }
 
-void PrintBusInfo(const Catalogue::TransportCatalogue& tansport_catalogue, const std::string& bus_name,
+StatReader::StatReader(std::istream& input_stream, std::ostream& output_stream)
+    : input_stream_(input_stream), output_stream_(output_stream) {
+
+}
+
+void StatReader::ReadAndProcessStats(const Catalogue::TransportCatalogue& catalogue){
+    int stat_request_count;
+    input_stream_ >> stat_request_count >> std::ws;
+    for (int i = 0; i < stat_request_count; ++i) {
+        std::string line;
+        getline(input_stream_, line);
+        ParseAndPrintStat(catalogue, line, output_stream_);
+    }
+
+}
+
+void StatReader::ParseAndPrintStat(const Catalogue::TransportCatalogue& catalogue, std::string_view request,
+                       std::ostream& output) {
+    
+    auto command_description = ParseRequestDescription(request);
+    
+    output<< command_description.command << " " << command_description.id << ": ";
+
+    if(command_description.command == "Bus"){
+        PrintBusInfo(catalogue, command_description.id, output);        
+    }else if(command_description.command == "Stop"){
+        PrintStopInfo(catalogue, command_description.id, output);
+    }
+}
+
+void StatReader::PrintBusInfo(const Catalogue::TransportCatalogue& catalogue, const std::string& bus_name,
                      std::ostream& output){
     try{
-        const Catalogue::BusRoutInfo info = tansport_catalogue.GetRouteInfo(bus_name);
+        const Catalogue::BusRoutInfo info = catalogue.GetRouteInfo(bus_name);
 
         output << info.count_stops << " stops on route, " <<
                 info.count_uniq_stops << " unique stops, " <<
@@ -48,10 +60,10 @@ void PrintBusInfo(const Catalogue::TransportCatalogue& tansport_catalogue, const
     }
 }
 
-void PrintStopInfo(const Catalogue::TransportCatalogue& tansport_catalogue, const std::string& stop_name,
+void StatReader::PrintStopInfo(const Catalogue::TransportCatalogue& catalogue, const std::string& stop_name,
                      std::ostream& output){
     try{
-        const auto& info = tansport_catalogue.GetStopInfo(stop_name);
+        const auto& info = catalogue.GetStopInfo(stop_name);
         if(info.empty()){
             output << "no buses" << std::endl;
             return;

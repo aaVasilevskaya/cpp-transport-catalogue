@@ -1,9 +1,5 @@
 #include "input_reader.h"
 
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-
 /**
  * Парсит строку вида "10.123,  -30.1837" и возвращает пару координат (широта, долгота)
  */
@@ -95,6 +91,22 @@ CommandDescription ParseCommandDescription(std::string_view line) {
             std::string(line.substr(colon_pos + 1))};
 }
 
+InputReader::InputReader(std::istream& input_stream)
+    :input_stream_(input_stream){
+};
+
+void InputReader::ReadAndApplyCommands(Catalogue::TransportCatalogue& catalogue){
+    int base_request_count;
+    input_stream_ >> base_request_count >> std::ws;
+
+    for (int i = 0; i < base_request_count; ++i) {
+        std::string line;
+        getline(input_stream_, line);
+        ParseLine(line);
+    }
+    ApplyCommands(catalogue);
+}
+
 void InputReader::ParseLine(std::string_view line) {
     auto command_description = ParseCommandDescription(line);
     if (command_description) {
@@ -102,15 +114,16 @@ void InputReader::ParseLine(std::string_view line) {
     }
 }
 
-void InputReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& Coordinates) const {
+void InputReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& catalogue) const {
     for(auto& command : commands_){
         if(command.command == "Stop"){
-            Coordinates.AddStop(command.id, ParseCoordinates(command.description));
+            catalogue.AddStop(command.id, ParseCoordinates(command.description));
         }
     }
     for(auto& command : commands_){
         if(command.command == "Bus"){
-            Coordinates.AddBus(command.id, ParseRoute(command.description));
+            catalogue.AddBus(command.id, ParseRoute(command.description));
         }
     }
 }
+

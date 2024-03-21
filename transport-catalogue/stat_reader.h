@@ -1,6 +1,7 @@
 #pragma once
 
-#include <iosfwd>
+#include <iomanip>
+#include <iostream>
 #include <string_view>
 
 #include "transport_catalogue.h"
@@ -19,11 +20,23 @@ struct RequestDescription {
     std::string id;           // id маршрута или остановки
 };
 
-void ParseAndPrintStat(const Catalogue::TransportCatalogue& tansport_catalogue, std::string_view request,
+class StatReader  {
+public:
+
+    explicit StatReader(std::istream& input_stream, std::ostream& output_stream);
+
+    void ReadAndProcessStats(const Catalogue::TransportCatalogue& catalogue);
+
+    void ParseAndPrintStat(const Catalogue::TransportCatalogue& catalogue, std::string_view request,
                        std::ostream& output);
 
-RequestDescription ParseRequestDescription(std::string_view line);
-void PrintBusInfo(const Catalogue::TransportCatalogue& tansport_catalogue, const std::string& bus_name,
-                 std::ostream& output);
-void PrintStopInfo(const Catalogue::TransportCatalogue& tansport_catalogue, const std::string& stop_name,
-                     std::ostream& output);
+private:
+    std::istream& input_stream_;
+    std::ostream& output_stream_;
+
+    void PrintBusInfo(const Catalogue::TransportCatalogue& catalogue, const std::string& bus_name,
+                    std::ostream& output);
+    void PrintStopInfo(const Catalogue::TransportCatalogue& catalogue, const std::string& stop_name,
+                        std::ostream& output);
+};
+

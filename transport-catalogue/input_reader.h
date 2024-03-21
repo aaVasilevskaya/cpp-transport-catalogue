@@ -2,6 +2,10 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <istream>
+#include <algorithm>
+#include <cassert>
+#include <iterator>
 
 #include "geo.h"
 #include "transport_catalogue.h"
@@ -23,6 +27,11 @@ struct CommandDescription {
 
 class InputReader {
 public:
+
+    explicit InputReader(std::istream& input_stream);
+
+    void ReadAndApplyCommands(Catalogue::TransportCatalogue& catalogue);
+
     /**
      * Парсит строку в структуру CommandDescription и сохраняет результат в commands_
      */
@@ -33,6 +42,9 @@ public:
      */
     void ApplyCommands(Catalogue::TransportCatalogue& catalogue) const;
 
+    
+
 private:
+    std::istream& input_stream_;
     std::vector<CommandDescription> commands_;
 };

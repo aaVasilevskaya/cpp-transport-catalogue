@@ -13,7 +13,7 @@ void TransportCatalogue::AddStop(std::string_view name, Coordinates coord){
     }
 }
 
-void TransportCatalogue::AddBus(std::string_view bus_name, std::vector<std::string_view> stop_names){
+void TransportCatalogue::AddBus(std::string_view bus_name, const std::vector<std::string_view>& stop_names){
 
     buses_.emplace_back(Bus{std::string(bus_name),std::vector<const Stop*>(stop_names.size())});
 
