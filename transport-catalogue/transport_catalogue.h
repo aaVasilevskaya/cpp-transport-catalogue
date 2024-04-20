@@ -44,9 +44,9 @@ public:
 private:
 	std::deque<Stop> stops_;
 	std::deque<Bus> buses_;
-	std::unordered_map<std::string, const Stop*> stop_ptrs_;
-	std::unordered_map<std::string, const Bus*> bus_ptrs_;
-	std::unordered_map<std::string, std::set<std::string_view>> buses_on_stop_;
+	std::unordered_map<std::string_view, const Stop*> stop_ptrs_;
+	std::unordered_map<std::string_view, const Bus*> bus_ptrs_;
+	std::unordered_map<std::string_view, std::set<std::string_view>> buses_on_stop_;
 
 	size_t CountUniqueStops(const Bus* bus) const;
 

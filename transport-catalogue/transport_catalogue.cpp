@@ -18,9 +18,8 @@ void TransportCatalogue::AddBus(std::string_view bus_name, const std::vector<std
     buses_.emplace_back(Bus{std::string(bus_name),std::vector<const Stop*>(stop_names.size())});
 
     for(size_t i = 0; i < stop_names.size(); i++){
-        std::string stop_name(stop_names[i]);
-        buses_.back().stops[i] = stop_ptrs_.at(stop_name);
-        buses_on_stop_[stop_name].insert(buses_.back().name);
+        buses_.back().stops[i] = stop_ptrs_.at(stop_names[i]);
+        buses_on_stop_[stop_names[i]].insert(buses_.back().name);
     }
     bus_ptrs_[buses_.back().name] = &buses_.back();
 }
@@ -39,8 +38,8 @@ BusRoutInfo TransportCatalogue::GetRouteInfo(std::string_view name) const{
 }
 
 std::set<std::string_view> TransportCatalogue::GetStopInfo(std::string_view stop_name) const{
-    if(buses_on_stop_.count(std::string(stop_name))){
-        return buses_on_stop_.at(std::string(stop_name));
+    if(buses_on_stop_.count(stop_name)){
+        return buses_on_stop_.at(stop_name);
     }else{
         throw TransportCatalogueException();
     }
