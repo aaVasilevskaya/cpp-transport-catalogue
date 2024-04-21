@@ -37,7 +37,7 @@ class TransportCatalogue {
 public:
 
 	void AddStop(std::string_view name, Coordinates coord);
-	void AddStopDistances(std::string_view name, std::vector<Catalogue::Distance>);
+	void AddStopDistances(std::string_view name, std::vector<Distance>& dists);
 	void AddBus(std::string_view bus_name,  const std::vector<std::string_view>& stop_names);
 
 	BusRoutInfo GetRouteInfo(std::string_view name) const;

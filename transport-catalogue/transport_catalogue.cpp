@@ -13,7 +13,7 @@ void TransportCatalogue::AddStop(std::string_view name, Coordinates coord){
     }
 }
 
-void TransportCatalogue::AddStopDistances(std::string_view name, std::vector<Catalogue::Distance> dists){
+void TransportCatalogue::AddStopDistances(std::string_view name, std::vector<Distance>& dists){
     for(auto& dist:dists){
         dist_between_stops_[std::make_pair(stop_ptrs_.at(name), stop_ptrs_.at(dist.name_location))] = dist.dist;
     }
