@@ -13,6 +13,12 @@ void TransportCatalogue::AddStop(std::string_view name, Coordinates coord){
     }
 }
 
+void TransportCatalogue::AddStopDistances(std::string_view name, std::vector<Catalogue::Distance> dists){
+    for(auto& dist:dists){
+        dist_between_stops_[std::make_pair(stop_ptrs_.at(name), stop_ptrs_.at(dist.name_location))] = dist.dist;
+    }
+}
+
 void TransportCatalogue::AddBus(std::string_view bus_name, const std::vector<std::string_view>& stop_names){
 
     buses_.emplace_back(Bus{std::string(bus_name),std::vector<const Stop*>(stop_names.size())});
@@ -25,12 +31,13 @@ void TransportCatalogue::AddBus(std::string_view bus_name, const std::vector<std
 }
 
 BusRoutInfo TransportCatalogue::GetRouteInfo(std::string_view name) const{
-    std::string bus_name(name);
-    if(bus_ptrs_.count(bus_name)){
-        const Bus* bus = bus_ptrs_.at(bus_name);
+    if(bus_ptrs_.count(name)){
+        const Bus* bus = bus_ptrs_.at(name);
+        auto road_length = ComputeRoadRouteLength(bus);
         return {bus->stops.size(),
                 CountUniqueStops(bus),
-                ComputeRouteLength(bus)};	
+                road_length,
+                road_length / ComputeGeographicalRouteLength(bus) };	
     }
     else{
         throw TransportCatalogueException();
@@ -53,13 +60,34 @@ size_t TransportCatalogue::CountUniqueStops(const Bus* bus) const {
     return unique_stops.size();
 }
 
-double TransportCatalogue::ComputeRouteLength(const Bus* bus) const {
+double TransportCatalogue::ComputeGeographicalRouteLength(const Bus* bus) const {
     double rout_length = 0;
     for (size_t i = 1; i < bus->stops.size(); ++i) {
         rout_length += ComputeDistance(bus->stops[i - 1]->coord, bus->stops[i]->coord);
     }
     rout_length += ComputeDistance(bus->stops.back()->coord, bus->stops.front()->coord);
     return rout_length;
-}  
+} 
+
+unsigned int TransportCatalogue::ComputeRoadRouteLength(const Bus* bus) const {
+    unsigned int rout_length = 0;
+    for (size_t i = 1; i < bus->stops.size(); ++i) {
+        auto stops_pair = std::make_pair(bus->stops[i - 1], bus->stops[i]);
+        if(dist_between_stops_.count(stops_pair)){
+            rout_length += dist_between_stops_.at(stops_pair);
+        }else{
+            stops_pair = std::make_pair(bus->stops[i], bus->stops[i - 1]);
+            if(dist_between_stops_.count(stops_pair)){
+                rout_length += dist_between_stops_.at(stops_pair);
+            }
+        } 
+    }
+
+    auto stops_pair = std::make_pair(bus->stops.back(), bus->stops.front());
+    if(dist_between_stops_.count(stops_pair)){
+        rout_length += dist_between_stops_.at(stops_pair);
+    }
+    return rout_length;
+} 
 
 }

@@ -54,7 +54,8 @@ void StatReader::PrintBusInfo(const Catalogue::TransportCatalogue& catalogue, co
 
         output << info.count_stops << " stops on route, " <<
                 info.count_uniq_stops << " unique stops, " <<
-                std::setprecision(6) << info.length <<" route length" << std::endl;
+                info.lenght << " route length, " <<
+                std::setprecision(6) << info.curvature << " curvature" << std::endl;
     }catch(Catalogue::TransportCatalogueException){
         output<< "not found" << std::endl;
     }

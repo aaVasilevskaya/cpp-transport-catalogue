@@ -114,10 +114,43 @@ void InputReader::ParseLine(std::string_view line) {
     }
 }
 
+Catalogue::Distance ExtractDistanceFromWords(std::string_view line){
+    unsigned int dist = 0;
+    std::string name_location;
+    
+    auto m_pos = line.find('m');
+    auto to_pos = line.find("to");
+    
+    dist = static_cast<unsigned int>(std::stoul(std::string(line.substr(0, m_pos))));
+    
+    name_location = std::string(Trim(line.substr(to_pos+2)));
+
+    return {dist, name_location};
+}
+
+std::vector<Catalogue::Distance> ParseDistances(std::string_view str){
+    std::vector<Catalogue::Distance> dists;  
+    std::vector<std::string_view> stop_info = Split(str, ',');
+    
+    if(stop_info.size() > 2){
+        dists.reserve(stop_info.size()-2);
+        
+        for(size_t i = 2; i < stop_info.size(); i++){
+            dists.push_back(ExtractDistanceFromWords(Trim(stop_info.at(i))));
+        }
+    }
+    return dists;
+}
+
 void InputReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& catalogue) const {
     for(auto& command : commands_){
         if(command.command == "Stop"){
             catalogue.AddStop(command.id, ParseCoordinates(command.description));
+        }
+    }
+    for(auto& command : commands_){
+        if(command.command == "Stop"){
+            catalogue.AddStopDistances(command.id, ParseDistances(command.description));
         }
     }
     for(auto& command : commands_){
