@@ -150,7 +150,10 @@ void InputReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& 
     }
     for(auto& command : commands_){
         if(command.command == "Stop"){
-            catalogue.AddStopDistances(command.id, ParseDistances(command.description));
+            auto distances = ParseDistances(command.description);
+            for(auto& dist:distances){
+                catalogue.AddStopsDistance(command.id, dist.name_location, dist.dist);
+            }
         }
     }
     for(auto& command : commands_){
