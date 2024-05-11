@@ -10,22 +10,14 @@
 #include <vector>
 
 
-#include "geo.h"
+// #include "geo.h"
+#include "domain.h"
 
 namespace Catalogue {
 
-struct Stop {
-    std::string name;
-    Coordinates coord;
-};
-struct Bus {
-	std::string name;
-	std::vector<const Stop*> stops;
-};
-
 struct BusRoutInfo{
-	size_t count_stops;
-	size_t count_uniq_stops;
+	unsigned int count_stops;
+	unsigned int count_uniq_stops;
 	unsigned int lenght;
 	double curvature;
 };
@@ -36,12 +28,22 @@ class TransportCatalogue {
 
 public:
 
-	void AddStop(std::string_view name, Coordinates coord);
+	void AddStop(std::string_view name, geo::Coordinates coord);
 	void AddStopsDistance(std::string_view from_name, std::string_view to_name, unsigned int dist);
-	void AddBus(std::string_view bus_name,  const std::vector<std::string_view>& stop_names);
+	void AddBus(std::string_view bus_name, bool is_roundtrip, const std::vector<std::string_view>& stop_names);
 
 	BusRoutInfo GetRouteInfo(std::string_view name) const;
 	std::set<std::string_view> GetStopInfo(std::string_view stop_name) const;
+	
+	const std::unordered_map<std::string_view, const Bus*>& GetAllBuses() const{
+		return bus_ptrs_;
+	}
+	const std::unordered_map<std::string_view, const Stop*>& GetAllStops() const{
+		return stop_ptrs_;
+	}
+	const std::unordered_map<std::string_view, std::set<std::string_view>>& GetAllBusesOnStops() const{
+		return buses_on_stop_;
+	}
 	
 private:
 	std::deque<Stop> stops_;
@@ -62,7 +64,7 @@ private:
 
 	std::unordered_map<std::pair<const Stop*, const Stop*>, unsigned int, StopPairHash> dist_between_stops_;
 
-	size_t CountUniqueStops(const Bus* bus) const;
+	unsigned int CountUniqueStops(const Bus* bus) const;
 	
 	unsigned int GetStopsDistance(const Stop* from_stop, const Stop* to_stop) const;
 	

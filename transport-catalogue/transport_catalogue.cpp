@@ -2,7 +2,7 @@
 
 namespace Catalogue {
 
-void TransportCatalogue::AddStop(std::string_view name, Coordinates coord){
+void TransportCatalogue::AddStop(std::string_view name, geo::Coordinates coord){
     stops_.emplace_back(Stop{std::string(name), std::move(coord)});
 
     const std::string* tmp_name = &stops_.back().name;
@@ -17,9 +17,9 @@ void TransportCatalogue::AddStopsDistance(std::string_view from_name, std::strin
     dist_between_stops_[{stop_ptrs_.at(from_name), stop_ptrs_.at(to_name)}] = dist;
 }
 
-void TransportCatalogue::AddBus(std::string_view bus_name, const std::vector<std::string_view>& stop_names){
+void TransportCatalogue::AddBus(std::string_view bus_name, bool is_roundtrip, const std::vector<std::string_view>& stop_names){
 
-    buses_.emplace_back(Bus{std::string(bus_name),std::vector<const Stop*>(stop_names.size())});
+    buses_.emplace_back(Bus{std::string(bus_name), is_roundtrip, std::vector<const Stop*>(stop_names.size())});
 
     for(size_t i = 0; i < stop_names.size(); i++){
         buses_.back().stops[i] = stop_ptrs_.at(stop_names[i]);
@@ -32,7 +32,7 @@ BusRoutInfo TransportCatalogue::GetRouteInfo(std::string_view name) const{
     if(bus_ptrs_.count(name) > 0){
         const Bus* bus = bus_ptrs_.at(name);
         auto road_length = ComputeRoadRouteLength(bus);
-        return {bus->stops.size(),
+        return {static_cast<unsigned int>(bus->stops.size()),
                 CountUniqueStops(bus),
                 road_length,
                 road_length / ComputeGeographicalRouteLength(bus) };	
@@ -47,12 +47,12 @@ std::set<std::string_view> TransportCatalogue::GetStopInfo(std::string_view stop
     throw TransportCatalogueException();
 }
 
-size_t TransportCatalogue::CountUniqueStops(const Bus* bus) const {
+unsigned int TransportCatalogue::CountUniqueStops(const Bus* bus) const {
     std::unordered_set<std::string_view> unique_stops;
     for (const Stop* stop : bus->stops) {
         unique_stops.insert(stop->name);
     }
-    return unique_stops.size();
+    return static_cast<unsigned int>(unique_stops.size());
 }
 
 unsigned int TransportCatalogue::GetStopsDistance(const Stop* from_stop, const Stop* to_stop) const{

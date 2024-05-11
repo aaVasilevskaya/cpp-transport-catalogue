@@ -1,8 +1,10 @@
 #pragma once
 
+#include <string>
 #include <cmath>
 
-namespace Catalogue {
+// namespace Catalogue {
+namespace geo {
 
 struct Coordinates {
     double lat;
@@ -20,7 +22,7 @@ struct Distance{
     std::string name_location;
 };
 
-inline double ComputeDistance(Coordinates from, Coordinates to) {
+inline double ComputeDistance(Coordinates from, Coordinates to){
     using namespace std;
     if (from == to) {
         return 0;
@@ -32,4 +34,5 @@ inline double ComputeDistance(Coordinates from, Coordinates to) {
         * earth_radius;
 }
 
-}
+}  // namespace geo
+// } // namespace Catalogue
