@@ -108,6 +108,11 @@ struct RenderSettings{
     std::vector <svg::Color> color_palette; // цветовая палитра
 };
 
+struct MapProjectorForBusesStops{
+    SphereProjector projector;
+    std::set<std::string_view> buses;
+}; 
+
 class MapRenderer{
 public:
     MapRenderer() = default;
@@ -125,8 +130,7 @@ private:
 
     RenderSettings setting_;
 
-    std::pair<SphereProjector, std::set<std::string_view>>
-            GenarateMapProjector(const std::unordered_map<std::string_view, const Catalogue::Bus*>& data);
+    MapProjectorForBusesStops GenerateMapProjector(const std::unordered_map<std::string_view, const Catalogue::Bus*>& data);
 
     void AddBusesPolyline(svg::Document& doc, SphereProjector proj, const std::set<std::string_view> buses_names,
                                     const std::unordered_map<std::string_view, const Catalogue::Bus*>& data);

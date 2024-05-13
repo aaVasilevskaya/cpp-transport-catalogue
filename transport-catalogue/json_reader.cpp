@@ -43,7 +43,7 @@ void JsonReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& c
     for(auto& command : commands_){
         if(command.command == "Bus"){
             const auto route_info = ParseRoute(command);
-            catalogue.AddBus(command.id.AsString(), route_info.first, route_info.second);
+            catalogue.AddBus(std::move(route_info.first.name), route_info.first.is_roundtrip, std::move(route_info.second));
         }
     }
 }
@@ -162,14 +162,18 @@ std::vector<geo::Distance> JsonReader::ParseDistances(const CommandDescription& 
     return dists;
 }
 
-std::pair<bool, std::vector<std::string_view>> JsonReader::ParseRoute(const CommandDescription& data) const{
-     std::vector<std::string_view> results;
+std::pair<Catalogue::Bus, std::vector<std::string_view>> JsonReader::ParseRoute(const CommandDescription& data) const{
+    Catalogue::Bus bus;
+    bus.name = data.id.AsString();
+    std::vector<std::string_view> results;
 
     const auto& stops = data.description.find("stops");
     bool is_roundtrip = false;
     
     if(stops !=  data.description.end()){
         is_roundtrip = data.description.find("is_roundtrip")->second.AsBool();
+        bus.is_roundtrip = is_roundtrip;
+        
         const auto& stops_as_array = stops->second.AsArray();
         if(is_roundtrip == true){
             // Для кольцевого маршрута [A,B,C,A]
@@ -189,7 +193,7 @@ std::pair<bool, std::vector<std::string_view>> JsonReader::ParseRoute(const Comm
             }
         }
     }
-    return {is_roundtrip, std::move(results)};
+    return {std::move(bus), std::move(results)};
 }
 
 svg::Color JsonReader::ParseColor(json::Node data){

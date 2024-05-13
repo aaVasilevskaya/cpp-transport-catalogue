@@ -19,10 +19,10 @@ svg::Document MapRenderer::GenerateMap(const Catalogue::TransportCatalogue& cata
     const auto& stops = catalogue.GetAllStops();
     const auto& buses_on_stop = catalogue.GetAllBusesOnStops();
 
-    auto projector_and_names = GenarateMapProjector(buses);
+    auto projector_and_names = GenerateMapProjector(buses);
 
-    const auto proj(std::move(projector_and_names.first));
-    const auto buses_names(std::move(projector_and_names.second));
+    const auto proj(std::move(projector_and_names.projector));
+    const auto buses_names(std::move(projector_and_names.buses));
     
     AddBusesPolyline(doc, proj, buses_names, buses);
     AddBusesNames(doc, proj, buses_names, buses);
@@ -33,7 +33,7 @@ svg::Document MapRenderer::GenerateMap(const Catalogue::TransportCatalogue& cata
     return doc;
 }
 //SphereProjector
-std::pair<SphereProjector, std::set<std::string_view>> MapRenderer::GenarateMapProjector(const std::unordered_map<std::string_view, const Catalogue::Bus*>& data){
+MapProjectorForBusesStops MapRenderer::GenerateMapProjector(const std::unordered_map<std::string_view, const Catalogue::Bus*>& data){
     std::vector<const geo::Coordinates*> all_coordinates;
     std::set<std::string_view> buses_names;
         
