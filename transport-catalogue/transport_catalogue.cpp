@@ -13,8 +13,8 @@ void TransportCatalogue::AddStop(std::string_view name, geo::Coordinates coord){
     }
 }
 
-void TransportCatalogue::AddStopsDistance(std::string_view from_name, std::string_view to_name, unsigned int dist){
-    dist_between_stops_[{stop_ptrs_.at(from_name), stop_ptrs_.at(to_name)}] = dist;
+void TransportCatalogue::AddStopsDistance(const Stop* from_stop, const Stop* to_stop, unsigned int dist){
+    dist_between_stops_[{from_stop, to_stop}] = dist;
 }
 
 void TransportCatalogue::AddBus(std::string_view bus_name, bool is_roundtrip, const std::vector<std::string_view>& stop_names){

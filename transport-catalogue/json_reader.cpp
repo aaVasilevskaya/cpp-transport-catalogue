@@ -36,7 +36,11 @@ void JsonReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& c
         if(command.command == "Stop"){
             auto distances = ParseDistances(command);
             for(auto& dist:distances){
-                catalogue.AddStopsDistance(command.id.AsString(), dist.name_location, dist.dist);
+                const auto& stop_from = catalogue.GetStopByName(command.id.AsString());
+                const auto& stop_to = catalogue.GetStopByName(dist.name_location);
+                if(stop_from && stop_to){
+                    catalogue.AddStopsDistance(stop_from.value(), stop_to.value(), dist.dist);
+                }
             }
         }
     }
