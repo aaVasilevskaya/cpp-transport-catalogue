@@ -224,43 +224,49 @@ svg::Color JsonReader::ParseColor(json::Node data){
 
 /*--------------------- Part of json request ----------------------------*/
 json::Dict JsonReader::GenerateBusInfo(const json::Node& id, const std::optional<Catalogue::BusRoutInfo>& info){
-    json::Dict rez;
-    rez["request_id"] = id;
-    if(info){
-        rez["stop_count"] = static_cast<int>(info->count_stops);
-        rez["unique_stop_count"] = static_cast<int>(info->count_uniq_stops);
-        rez["curvature"] = info->curvature;
-        rez["route_length"] = static_cast<int>(info->lenght);
-    }else{
-        rez["error_message"] = std::string("not found");
+    if(!info){
+        return GenerateErrorMessege(id);
     }
-    return rez;
+     return json::Builder{}.StartDict()
+                            .Key("request_id").Value(id.GetValue())
+                            .Key("stop_count").Value(static_cast<int>(info->count_stops))
+                            .Key("unique_stop_count").Value(static_cast<int>(info->count_uniq_stops))
+                            .Key("curvature").Value(info->curvature)
+                            .Key("route_length").Value(static_cast<int>(info->lenght))
+                            .EndDict().Build().AsMap();
 }
 
 json::Dict JsonReader::GenerateStopInfo(const json::Node& id, const std::optional<std::set<std::string_view>>& info){
-    json::Dict rez;
-    rez["request_id"] = id;
-    
-    if(info){
-        json::Array buses;
-        for(const auto& bus:info.value()){
-            buses.emplace_back(std::string(bus));
-        }
-        rez["buses"] = std::move(buses);       
-    }else{
-        rez["error_message"] = std::string("not found");
+
+    if(!info){
+        return GenerateErrorMessege(id);
     }
- 
-    return rez;
+    json::Array buses;
+    for(const auto& bus:info.value()){
+        buses.emplace_back(std::string(bus));
+    }
+     return json::Builder{}.StartDict()
+                            .Key("request_id").Value(id.GetValue())
+                            .Key("buses").Value(std::move(buses))
+                            .EndDict().Build().AsMap();
+    
+}
+
+json::Dict JsonReader::GenerateErrorMessege(const json::Node& id){
+    return json::Builder{}.StartDict()
+                            .Key("request_id").Value(id.GetValue())
+                            .Key("error_message").Value(std::string("not found"))
+                            .EndDict().Build().AsMap();
 }
 
 json::Dict JsonReader::GenerateMapInfo(const json::Node& id, const svg::Document& info){
-    json::Dict rez;
 
     std::ostringstream stream;
     info.Render(stream);
-    rez["map"] = stream.str();
-    rez["request_id"] = id;
- 
-    return rez;
+
+    return json::Builder{}.StartDict()
+                        .Key("map").Value(stream.str())
+                        .Key("request_id").Value(id.GetValue())
+                        .EndDict().Build().AsMap();
+
 }

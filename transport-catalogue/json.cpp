@@ -240,7 +240,19 @@ const Array& Node::AsArray() const {
     }
     throw (std::logic_error("not Array"));
 }
+Array& Node::AsArray() {
+    if (IsArray()){
+        return std::get<Array>(data_);
+    }
+    throw (std::logic_error("not Array"));
+}
 const Dict& Node::AsMap() const {
+    if (IsMap()){
+        return std::get<Dict>(data_);
+    }
+    throw (std::logic_error("not Map"));
+}
+Dict& Node::AsMap(){
     if (IsMap()){
         return std::get<Dict>(data_);
     }

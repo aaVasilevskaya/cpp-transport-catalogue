@@ -38,7 +38,9 @@ public:
     const std::string& AsString() const;
     bool AsBool() const;
     const Array& AsArray() const;
+    Array& AsArray();
     const Dict& AsMap() const;
+    Dict& AsMap();
     
     bool IsInt() const;
     bool IsDouble() const;

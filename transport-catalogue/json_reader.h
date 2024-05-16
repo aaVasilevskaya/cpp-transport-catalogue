@@ -13,6 +13,7 @@
 #include <iterator>
 #include <unordered_map>
 #include "json.h"
+#include "json_builder.h"
 #include "geo.h"
 #include "transport_catalogue.h"
 #include "map_renderer.h"
@@ -81,6 +82,7 @@ private:
     /*--------------------- Answer on requests ----------------------------*/
     json::Dict GenerateBusInfo(const json::Node& id, const std::optional<Catalogue::BusRoutInfo>& info);
     json::Dict GenerateStopInfo(const json::Node& id, const std::optional<std::set<std::string_view>>& info);
+    json::Dict GenerateErrorMessege(const json::Node& id);
     json::Dict GenerateMapInfo(const json::Node& id, const svg::Document& info);
 
 
