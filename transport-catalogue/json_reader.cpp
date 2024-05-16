@@ -46,8 +46,7 @@ void JsonReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& c
     }
     for(auto& command : commands_){
         if(command.command == "Bus"){
-            const auto route_info = ParseRoute(command);
-            catalogue.AddBus(std::move(route_info.first.name), route_info.first.is_roundtrip, std::move(route_info.second));
+            catalogue.AddBus(ParseRoute(command, catalogue));
         }
     }
 }
@@ -166,10 +165,9 @@ std::vector<geo::Distance> JsonReader::ParseDistances(const CommandDescription& 
     return dists;
 }
 
-std::pair<Catalogue::Bus, std::vector<std::string_view>> JsonReader::ParseRoute(const CommandDescription& data) const{
+Catalogue::Bus JsonReader::ParseRoute(const CommandDescription& data, const Catalogue::TransportCatalogue& catalogue) const{
     Catalogue::Bus bus;
     bus.name = data.id.AsString();
-    std::vector<std::string_view> results;
 
     const auto& stops = data.description.find("stops");
     bool is_roundtrip = false;
@@ -181,23 +179,23 @@ std::pair<Catalogue::Bus, std::vector<std::string_view>> JsonReader::ParseRoute(
         const auto& stops_as_array = stops->second.AsArray();
         if(is_roundtrip == true){
             // Для кольцевого маршрута [A,B,C,A]
-            results.reserve(stops_as_array.size() + 1);
+            bus.stops.reserve(stops_as_array.size() + 1);
             for (auto it = stops_as_array.begin(); it != stops_as_array.end(); ++it) {
-                results.push_back(it->AsString());
+                bus.stops.push_back((catalogue.GetStopByName(it->AsString())).value());
             }
 
         } else {
             // Для некольцевого маршрута [A,B,C,D,C,B,A]
-            results.reserve(stops_as_array.size() * 2 - 1);
+            bus.stops.reserve(stops_as_array.size() * 2 - 1);
             for (auto it = stops_as_array.begin(); it != stops_as_array.end(); ++it) {
-                results.push_back(it->AsString());
+                bus.stops.push_back((catalogue.GetStopByName(it->AsString())).value());
             }
             for (auto it = stops_as_array.rbegin() + 1; it != stops_as_array.rend(); ++it) {
-                results.push_back(it->AsString());
+                bus.stops.push_back((catalogue.GetStopByName(it->AsString())).value());
             }
         }
     }
-    return {std::move(bus), std::move(results)};
+    return bus;
 }
 
 svg::Color JsonReader::ParseColor(json::Node data){
@@ -260,10 +258,7 @@ json::Dict JsonReader::GenerateMapInfo(const json::Node& id, const svg::Document
     json::Dict rez;
 
     std::ostringstream stream;
-    // std::string s;
     info.Render(stream);
-    // s = stream.str();
-    // stream >> s;
     rez["map"] = stream.str();
     rez["request_id"] = id;
  

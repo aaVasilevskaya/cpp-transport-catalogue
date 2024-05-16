@@ -17,15 +17,15 @@ void TransportCatalogue::AddStopsDistance(const Stop* from_stop, const Stop* to_
     dist_between_stops_[{from_stop, to_stop}] = dist;
 }
 
-void TransportCatalogue::AddBus(std::string_view bus_name, bool is_roundtrip, const std::vector<std::string_view>& stop_names){
-
-    buses_.emplace_back(Bus{std::string(bus_name), is_roundtrip, std::vector<const Stop*>(stop_names.size())});
-
-    for(size_t i = 0; i < stop_names.size(); i++){
-        buses_.back().stops[i] = stop_ptrs_.at(stop_names[i]);
-        buses_on_stop_[stop_names[i]].insert(buses_.back().name);
+void TransportCatalogue::AddBus(Bus bus){
+    buses_.emplace_back(std::move(bus));
+    
+    const auto& last_added_bus = buses_.back();
+    for(const auto& stop : last_added_bus.stops){
+        buses_on_stop_[stop->name].insert(last_added_bus.name);
     }
-    bus_ptrs_[buses_.back().name] = &buses_.back();
+    
+    bus_ptrs_[last_added_bus.name] = &last_added_bus;
 }
 
 BusRoutInfo TransportCatalogue::GetRouteInfo(std::string_view name) const{

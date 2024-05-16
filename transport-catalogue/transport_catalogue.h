@@ -31,7 +31,7 @@ public:
 
 	void AddStop(std::string_view name, geo::Coordinates coord);
 	void AddStopsDistance(const Stop* from_stop, const Stop* to_stop, unsigned int dist);
-	void AddBus(std::string_view bus_name, bool is_roundtrip, const std::vector<std::string_view>& stop_names);
+	void AddBus(Bus bus);
 
 	BusRoutInfo GetRouteInfo(std::string_view name) const;
 	std::set<std::string_view> GetStopInfo(std::string_view stop_name) const;

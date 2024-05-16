@@ -92,7 +92,7 @@ private:
     //For commands
     geo::Coordinates ParseCoordinates(const CommandDescription& data) const;
     std::vector<geo::Distance> ParseDistances(const CommandDescription& data) const;
-    std::pair<Catalogue::Bus, std::vector<std::string_view>> ParseRoute(const CommandDescription& data) const;
+    Catalogue::Bus ParseRoute(const CommandDescription& data, const Catalogue::TransportCatalogue& catalogue) const;
     
     //For renderer
     svg::Color ParseColor(json::Node data);
