@@ -1,2 +1,127 @@
-{"render_settings": {"width": 62.00796198553763, "height": 94.41396041405659, "padding": 0.5321630215472877, "stop_radius": 72.05849768266349, "line_width": 18.351540256308763, "stop_label_font_size": 34, "stop_label_offset": [0.715031105017232, 62.099476652693454], "underlayer_color": "gold", "underlayer_width": 6.0555100418263725, "color_palette": [[10, 115, 67], "bisque", "aqua", [105, 116, 38], [33, 149, 252], "indigo", [60, 204, 193], "peru", [171, 127, 169], "yellow", "white", "brown", "maroon", [45, 68, 224], "olive", [38, 243, 193], "magenta", [106, 53, 116], [22, 83, 105, 0.5255996010471113], "tomato", [167, 253, 134], [26, 242, 85], "white", [186, 124, 57, 0.6125135811895533], "tomato", "cornsilk", [100, 219, 62], [12, 173, 81], [116, 231, 101], "brown", [73, 25, 54], [91, 255, 18], [211, 57, 8], "indigo", [22, 240, 228, 0.7117748317077027], [224, 162, 232], [60, 216, 179], [249, 224, 110], [197, 234, 220], "green", [193, 21, 67], [4, 21, 63], "cyan", "teal", "lime", [222, 238, 99], "white", [126, 246, 35], "khaki", [22, 163, 202], [34, 43, 11], "bisque", [106, 97, 95, 0.04179568550489954], [9, 19, 202, 0.7527748503029413], [58, 118, 210], [58, 88, 91, 0.20138602193593835], [176, 24, 3], "khaki", [84, 212, 93], [31, 167, 6], "brown", "thistle", [199, 123, 112], "fuchsia", [202, 43, 121, 0.9499584145277128], "navy", "pink", "lime", "tomato", [194, 52, 227]], "bus_label_font_size": 27, "bus_label_offset": [22.17481694637054, -12.247865550082764]}, "base_requests": [{"type": "Stop", "name": "A1", "latitude": 55.611087, "longitude": 37.20829, "road_distances": {"A2": 1000, "A3": 1000}}, {"type": "Stop", "name": "A2", "latitude": 55.595884, "longitude": 37.209755, "road_distances": {"A3": 1000}}, {"type": "Stop", "name": "A3", "latitude": 55.632761, "longitude": 37.333324, "road_distances": {}}, {"type": "Bus", "name": "B1", "stops": ["A3", "A2"], "is_roundtrip": false}, {"type": "Bus", "name": "B2", "stops": ["A2", "A3"], "is_roundtrip": false}], "stat_requests": [{"id": 597129942, "type": "Stop", "name": "A1"}]}
-            
+{
+    "base_requests": [
+        {
+            "is_roundtrip": true,
+            "name": "297",
+            "stops": [
+                "Biryulyovo Zapadnoye",
+                "Biryulyovo Tovarnaya",
+                "Universam",
+                "Biryulyovo Zapadnoye"
+            ],
+            "type": "Bus"
+        },
+        {
+            "is_roundtrip": false,
+            "name": "635",
+            "stops": [
+                "Biryulyovo Tovarnaya",
+                "Universam",
+                "Prazhskaya"
+            ],
+            "type": "Bus"
+        },
+        {
+            "latitude": 55.574371,
+            "longitude": 37.6517,
+            "name": "Biryulyovo Zapadnoye",
+            "road_distances": {
+                "Biryulyovo Tovarnaya": 2600
+            },
+            "type": "Stop"
+        },
+        {
+            "latitude": 55.587655,
+            "longitude": 37.645687,
+            "name": "Universam",
+            "road_distances": {
+                "Biryulyovo Tovarnaya": 1380,
+                "Biryulyovo Zapadnoye": 2500,
+                "Prazhskaya": 4650
+            },
+            "type": "Stop"
+        },
+        {
+            "latitude": 55.592028,
+            "longitude": 37.653656,
+            "name": "Biryulyovo Tovarnaya",
+            "road_distances": {
+                "Universam": 890
+            },
+            "type": "Stop"
+        },
+        {
+            "latitude": 55.611717,
+            "longitude": 37.603938,
+            "name": "Prazhskaya",
+            "road_distances": {},
+            "type": "Stop"
+        }
+    ],
+    "render_settings": {
+        "bus_label_font_size": 20,
+        "bus_label_offset": [
+            7,
+            15
+        ],
+        "color_palette": [
+            "green",
+            [
+                255,
+                160,
+                0
+            ],
+            "red"
+        ],
+        "height": 200,
+        "line_width": 14,
+        "padding": 30,
+        "stop_label_font_size": 20,
+        "stop_label_offset": [
+            7,
+            -3
+        ],
+        "stop_radius": 5,
+        "underlayer_color": [
+            255,
+            255,
+            255,
+            0.85
+        ],
+        "underlayer_width": 3,
+        "width": 200
+    },
+    "routing_settings": {
+        "bus_velocity": 40,
+        "bus_wait_time": 6
+    },
+    "stat_requests": [
+        {
+            "id": 1,
+            "name": "297",
+            "type": "Bus"
+        },
+        {
+            "id": 2,
+            "name": "635",
+            "type": "Bus"
+        },
+        {
+            "id": 3,
+            "name": "Universam",
+            "type": "Stop"
+        },
+        {
+            "from": "Biryulyovo Zapadnoye",
+            "id": 4,
+            "to": "Universam",
+            "type": "Route"
+        },
+        {
+            "from": "Biryulyovo Zapadnoye",
+            "id": 5,
+            "to": "Prazhskaya",
+            "type": "Route"
+        }
+    ]
+}

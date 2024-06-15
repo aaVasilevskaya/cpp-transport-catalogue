@@ -1,9 +1,11 @@
 #pragma once
 
-#include<optional>
+#include <optional>
+#include <memory>
 
 #include "map_renderer.h"
 #include "transport_catalogue.h"
+#include "transport_router.h"
 
 /*
  * Здесь можно было бы разместить код обработчика запросов к базе, содержащего логику, которую не
@@ -25,10 +27,10 @@
 class RequestHandler {
 public:
     // MapRenderer понадобится в следующей части итогового проекта
-    RequestHandler(const Catalogue::TransportCatalogue& db, renderer::MapRenderer& renderer);
+    RequestHandler(const catalogue::TransportCatalogue& db, renderer::MapRenderer& renderer);
 
     // Возвращает информацию о маршруте (запрос Bus)
-    std::optional<Catalogue::BusRoutInfo> GetBusStat(const std::string_view& bus_name) const;
+    std::optional<catalogue::BusRoutInfo> GetBusStat(const std::string_view& bus_name) const;
 
     // Возвращает маршруты, проходящие через
     const std::optional<std::set<std::string_view>> GetBusesByStop(const std::string_view& stop_name) const;
@@ -38,8 +40,14 @@ public:
         return renderer_.GenerateMap(db_);
     }
 
+    void SetRouter(const std::shared_ptr<routing::TransportRouter>& router);
+    std::optional<routing::RouteData> GetRoute(std::string_view from_stop, std::string_view to_stop) const;
+
+
 private:
     // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
-    const Catalogue::TransportCatalogue& db_;
+    const catalogue::TransportCatalogue& db_;
     renderer::MapRenderer& renderer_;
+    std::shared_ptr<routing::TransportRouter> router_;
+
 };

@@ -17,7 +17,7 @@
  *
  */
 
-namespace Catalogue {
+namespace catalogue {
 
 // Определение структуры остановки
 struct Stop {
@@ -32,4 +32,4 @@ struct Bus {
     std::vector<const Stop*> stops;
 };
 
-} // namespace Catalogue
+} // namespace catalogue

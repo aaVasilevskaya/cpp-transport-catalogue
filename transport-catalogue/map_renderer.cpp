@@ -11,7 +11,7 @@ bool IsZero(double value) {
     return std::abs(value) < EPSILON;
 }
 
-svg::Document MapRenderer::GenerateMap(const Catalogue::TransportCatalogue& catalogue){
+svg::Document MapRenderer::GenerateMap(const catalogue::TransportCatalogue& catalogue){
     svg::Document doc;
     
     const auto buses = catalogue.GetAllBuses();
@@ -33,7 +33,7 @@ svg::Document MapRenderer::GenerateMap(const Catalogue::TransportCatalogue& cata
     return doc;
 }
 //SphereProjector
-MapProjectorForBusesStops MapRenderer::GenerateMapProjector(const std::unordered_map<std::string_view, const Catalogue::Bus*>& data){
+MapProjectorForBusesStops MapRenderer::GenerateMapProjector(const std::unordered_map<std::string_view, const catalogue::Bus*>& data){
     std::vector<const geo::Coordinates*> all_coordinates;
     std::set<std::string_view> buses_names;
         
@@ -54,7 +54,7 @@ MapProjectorForBusesStops MapRenderer::GenerateMapProjector(const std::unordered
 }
 
 void MapRenderer::AddBusesPolyline(svg::Document& doc, SphereProjector proj, const std::set<std::string_view> buses_names,
-                                 const std::unordered_map<std::string_view, const Catalogue::Bus*>& data){
+                                 const std::unordered_map<std::string_view, const catalogue::Bus*>& data){
 
         //Generation of polylines
         auto color_it = setting_.color_palette.begin();
@@ -79,7 +79,7 @@ void MapRenderer::AddBusesPolyline(svg::Document& doc, SphereProjector proj, con
     }
 
 void MapRenderer::AddBusesNames(svg::Document& doc, const SphereProjector& proj, const std::set<std::string_view> buses_names,
-                                    const std::unordered_map<std::string_view, const Catalogue::Bus*>& data){
+                                    const std::unordered_map<std::string_view, const catalogue::Bus*>& data){
     auto color_it = setting_.color_palette.begin();
     
     for(const auto& bus_name:buses_names){    
@@ -144,7 +144,7 @@ std::array<svg::Text,2> MapRenderer::MakeNameOfBus(std::string_view name,svg::Po
 }
 
 std::set<std::string_view> MapRenderer::AddStopsCircle(svg::Document& doc, const SphereProjector& proj,
-                const std::unordered_map<std::string_view, const Catalogue::Stop*>& stops,
+                const std::unordered_map<std::string_view, const catalogue::Stop*>& stops,
                 const std::unordered_map<std::string_view, std::set<std::string_view>>& buses_on_stop){
     
     std::set<std::string_view> stops_names;
@@ -163,7 +163,7 @@ std::set<std::string_view> MapRenderer::AddStopsCircle(svg::Document& doc, const
 }
 
 void MapRenderer::AddStopsNames(svg::Document& doc, const SphereProjector& proj, const std::set<std::string_view> stops_names,
-                const std::unordered_map<std::string_view, const Catalogue::Stop*>& stops_info){
+                const std::unordered_map<std::string_view, const catalogue::Stop*>& stops_info){
     
     for(const auto& stop:stops_names){
         svg::Text svg_name_of_stop;

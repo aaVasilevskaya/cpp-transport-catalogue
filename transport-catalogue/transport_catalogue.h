@@ -11,10 +11,9 @@
 #include <optional>
 
 
-// #include "geo.h"
 #include "domain.h"
 
-namespace Catalogue {
+namespace catalogue {
 
 struct BusRoutInfo{
 	unsigned int count_stops;

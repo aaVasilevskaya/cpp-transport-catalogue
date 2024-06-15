@@ -1,6 +1,6 @@
 #include "transport_catalogue.h"
 
-namespace Catalogue {
+namespace catalogue {
 
 void TransportCatalogue::AddStop(std::string_view name, geo::Coordinates coord){
     stops_.emplace_back(Stop{std::string(name), std::move(coord)});

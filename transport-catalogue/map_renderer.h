@@ -120,7 +120,7 @@ public:
     : setting_(settings){
 
     }
-    svg::Document GenerateMap(const Catalogue::TransportCatalogue& catalogue);
+    svg::Document GenerateMap(const catalogue::TransportCatalogue& catalogue);
 
     void SetSettings(const RenderSettings& settings){
         setting_ = settings;
@@ -130,20 +130,20 @@ private:
 
     RenderSettings setting_;
 
-    MapProjectorForBusesStops GenerateMapProjector(const std::unordered_map<std::string_view, const Catalogue::Bus*>& data);
+    MapProjectorForBusesStops GenerateMapProjector(const std::unordered_map<std::string_view, const catalogue::Bus*>& data);
 
     void AddBusesPolyline(svg::Document& doc, SphereProjector proj, const std::set<std::string_view> buses_names,
-                                    const std::unordered_map<std::string_view, const Catalogue::Bus*>& data);
+                                    const std::unordered_map<std::string_view, const catalogue::Bus*>& data);
 
     void AddBusesNames(svg::Document& doc, const SphereProjector& proj, const std::set<std::string_view> buses_names,
-                    const std::unordered_map<std::string_view,const Catalogue::Bus*>& data);
+                    const std::unordered_map<std::string_view,const catalogue::Bus*>& data);
  
     std::set<std::string_view> AddStopsCircle(svg::Document& doc, const SphereProjector& proj,
-                    const std::unordered_map<std::string_view, const Catalogue::Stop*>& stops,
+                    const std::unordered_map<std::string_view, const catalogue::Stop*>& stops,
                     const std::unordered_map<std::string_view, std::set<std::string_view>>& buses_on_stop);
 
     void AddStopsNames(svg::Document& doc, const SphereProjector& proj, const std::set<std::string_view> stops_names,
-                    const std::unordered_map<std::string_view, const Catalogue::Stop*>& stops_info);
+                    const std::unordered_map<std::string_view, const catalogue::Stop*>& stops_info);
 
     std::array<svg::Text,2> MakeNameOfBus(std::string_view name,svg::Point& position, svg::Color& color);
     std::array<svg::Text,2> MakeNameOfStop(std::string_view name, const svg::Point& position);

@@ -17,8 +17,12 @@ void JsonReader::ReadAndParse(){
         commands_ = std::move(ParseCommands(base->second.AsArray()));
     }
 
+    if(const auto base = doc_as_dict.find("routing_settings"); base != doc_as_dict.end()){
+        routing_settings_ = std::move(ParseRouteSetting(base->second.AsMap()));
+    }
+
     if(const auto base = doc_as_dict.find("render_settings"); base != doc_as_dict.end()){
-        renderer_ = ParseRender(base->second.AsMap());
+        renderer_ = std::move(ParseRender(base->second.AsMap()));
     }
 
     if(const auto base = doc_as_dict.find("stat_requests"); base != doc_as_dict.end()){
@@ -26,7 +30,7 @@ void JsonReader::ReadAndParse(){
     }  
 }
 
-void JsonReader::ApplyCommands([[maybe_unused]] Catalogue::TransportCatalogue& catalogue) const {
+void JsonReader::ApplyCommands([[maybe_unused]] catalogue::TransportCatalogue& catalogue) const {
     for(auto& command : commands_){
         if(command.command == "Stop"){
             catalogue.AddStop(command.id.AsString(), ParseCoordinates(command));
@@ -56,15 +60,17 @@ json::Document JsonReader::ApplyRequest(const RequestHandler& handler){
     for(const auto& element:request_){
         const auto& type_str = element.type.AsString();
         if(type_str == "Bus"){
-            std::optional<Catalogue::BusRoutInfo> info = handler.GetBusStat(element.description.at("name").AsString());
+            std::optional<catalogue::BusRoutInfo> info = handler.GetBusStat(element.description.at("name").AsString());
             rez_array.emplace_back(GenerateBusInfo(element.id, info));
-
         }else if(type_str == "Stop"){
             const auto info = handler.GetBusesByStop(element.description.at("name").AsString());
             rez_array.emplace_back(GenerateStopInfo(element.id, info));
         }else if(type_str == "Map"){
             const auto info = handler.RenderMap();
             rez_array.emplace_back(GenerateMapInfo(element.id, info));
+        }else if(type_str == "Route"){
+            const auto info = handler.GetRoute(element.description.at("from").AsString(), element.description.at("to").AsString());
+            rez_array.emplace_back(GenerateRouteInfo(element.id, info));
         }
     }
     return json::Document(rez_array);
@@ -73,6 +79,10 @@ json::Document JsonReader::ApplyRequest(const RequestHandler& handler){
 
 void JsonReader::ApplyRender(renderer::MapRenderer& renderer){
     renderer.SetSettings(renderer_);
+}
+
+void JsonReader::ApplyRouter(routing::Settings& settings){
+    settings = routing_settings_;
 }
 
 /*--------------------- Parser ----------------------------*/
@@ -145,6 +155,13 @@ renderer::RenderSettings JsonReader::ParseRender(const json::Dict& data){
     return settings;
 }
 
+routing::Settings JsonReader::ParseRouteSetting(const json::Dict& data){
+    routing::Settings settings;
+    settings.bus_velocity = data.at("bus_velocity").AsInt();
+    settings.bus_wait_time = data.at("bus_wait_time").AsInt();
+    return settings;
+}
+
 geo::Coordinates JsonReader::ParseCoordinates(const CommandDescription& data) const{
     const auto& lat = data.description.find("latitude");
     const auto& lng = data.description.find("longitude");
@@ -165,8 +182,8 @@ std::vector<geo::Distance> JsonReader::ParseDistances(const CommandDescription& 
     return dists;
 }
 
-Catalogue::Bus JsonReader::ParseRoute(const CommandDescription& data, const Catalogue::TransportCatalogue& catalogue) const{
-    Catalogue::Bus bus;
+catalogue::Bus JsonReader::ParseRoute(const CommandDescription& data, const catalogue::TransportCatalogue& catalogue) const{
+    catalogue::Bus bus;
     bus.name = data.id.AsString();
 
     const auto& stops = data.description.find("stops");
@@ -223,7 +240,7 @@ svg::Color JsonReader::ParseColor(json::Node data){
 }
 
 /*--------------------- Part of json request ----------------------------*/
-json::Dict JsonReader::GenerateBusInfo(const json::Node& id, const std::optional<Catalogue::BusRoutInfo>& info){
+json::Dict JsonReader::GenerateBusInfo(const json::Node& id, const std::optional<catalogue::BusRoutInfo>& info){
     if(!info){
         return GenerateErrorMessege(id);
     }
@@ -268,5 +285,37 @@ json::Dict JsonReader::GenerateMapInfo(const json::Node& id, const svg::Document
                         .Key("map").Value(stream.str())
                         .Key("request_id").Value(id.GetValue())
                         .EndDict().Build().AsMap();
+
+}
+
+json::Dict JsonReader::GenerateRouteInfo(const json::Node& id, std::optional<routing::RouteData> info){
+
+    if(!info){
+        return GenerateErrorMessege(id);
+    }
+ 
+    json::Array rout_items;
+    for (const auto& part : info.value().parts) {
+        json::Dict dict_tmp;
+        dict_tmp["type"] = part.type;
+
+        if (part.type == "Wait") {
+            const auto& wait_item = static_cast<const routing::WaitEdge&>(part);
+            dict_tmp["stop_name"] = std::string(wait_item.name);
+        } else if (part.type == "Bus") {
+            const auto& bus_item = static_cast<const routing::BusEdge&>(part);
+            dict_tmp["bus_name"] = std::string(bus_item.name);
+            dict_tmp["span_count"] = static_cast<int>(bus_item.span_count);
+        }
+        dict_tmp["time"] = part.time;
+
+        rout_items.push_back(std::move(dict_tmp));
+    }
+
+     return json::Builder{}.StartDict()
+                            .Key("request_id").Value(id.GetValue())
+                            .Key("total_time").Value(info.value().total_time)
+                            .Key("items").Value(std::move(rout_items))
+                            .EndDict().Build().AsMap();
 
 }

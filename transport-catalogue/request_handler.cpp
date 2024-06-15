@@ -8,15 +8,15 @@
  * можете оставить его пустым.
  */
 
-RequestHandler::RequestHandler(const Catalogue::TransportCatalogue& db, renderer::MapRenderer& renderer)
+RequestHandler::RequestHandler(const catalogue::TransportCatalogue& db, renderer::MapRenderer& renderer)
 :db_(db), renderer_(renderer){
 }
 
-std::optional<Catalogue::BusRoutInfo> RequestHandler::GetBusStat(const std::string_view& bus_name) const{
+std::optional<catalogue::BusRoutInfo> RequestHandler::GetBusStat(const std::string_view& bus_name) const{
     try{
         const auto& info = db_.GetRouteInfo(bus_name);
         return info;
-    }catch(Catalogue::TransportCatalogueException){
+    }catch(catalogue::TransportCatalogueException){
         return std::nullopt;
     }
 }
@@ -26,11 +26,18 @@ const std::optional<std::set<std::string_view>> RequestHandler::GetBusesByStop(c
     try{
         const auto& info = db_.GetStopInfo(stop_name);
         return info;
-    }catch(Catalogue::TransportCatalogueException){
+    }catch(catalogue::TransportCatalogueException){
         return std::nullopt;
     }
 }
 
-// svg::Document RequestHandler::RenderMap() const{
-//     return renderer_.
-// }
+void RequestHandler::SetRouter(const std::shared_ptr<routing::TransportRouter>& router){
+    router_ = router;
+}
+
+std::optional<routing::RouteData> RequestHandler::GetRoute(std::string_view from_stop, std::string_view to_stop) const{
+    if (!router_) {
+        return std::nullopt;
+    }
+    return router_->BuildRoute(from_stop, to_stop);
+}
