@@ -31,8 +31,8 @@ const std::optional<std::set<std::string_view>> RequestHandler::GetBusesByStop(c
     }
 }
 
-void RequestHandler::SetRouter(const std::shared_ptr<routing::TransportRouter>& router){
-    router_ = router;
+void RequestHandler::SetRouter(const routing::TransportRouter& router){
+    router_.emplace(router);
 }
 
 std::optional<routing::RouteData> RequestHandler::GetRoute(std::string_view from_stop, std::string_view to_stop) const{

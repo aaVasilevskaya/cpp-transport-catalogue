@@ -297,18 +297,19 @@ json::Dict JsonReader::GenerateRouteInfo(const json::Node& id, std::optional<rou
     json::Array rout_items;
     for (const auto& part : info.value().parts) {
         json::Dict dict_tmp;
-        dict_tmp["type"] = part.type;
-
-        if (part.type == "Wait") {
-            const auto& wait_item = static_cast<const routing::WaitEdge&>(part);
+        
+        if (std::holds_alternative<routing::WaitEdge>(part)) {
+            const auto& wait_item = std::get<routing::WaitEdge>(part);
+            dict_tmp["type"] = wait_item.type;
             dict_tmp["stop_name"] = std::string(wait_item.name);
-        } else if (part.type == "Bus") {
-            const auto& bus_item = static_cast<const routing::BusEdge&>(part);
-            dict_tmp["bus_name"] = std::string(bus_item.name);
+            dict_tmp["time"] = wait_item.time;
+        } else if (std::holds_alternative<routing::BusEdge>(part)) {
+            const auto& bus_item = std::get<routing::BusEdge>(part);
+            dict_tmp["type"] = bus_item.type;
+            dict_tmp["bus"] = std::string(bus_item.name);
             dict_tmp["span_count"] = static_cast<int>(bus_item.span_count);
-        }
-        dict_tmp["time"] = part.time;
-
+            dict_tmp["time"] = bus_item.time;
+        } 
         rout_items.push_back(std::move(dict_tmp));
     }
 

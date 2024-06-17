@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <memory>
 
 #include "map_renderer.h"
 #include "transport_catalogue.h"
@@ -26,7 +25,6 @@
 
 class RequestHandler {
 public:
-    // MapRenderer понадобится в следующей части итогового проекта
     RequestHandler(const catalogue::TransportCatalogue& db, renderer::MapRenderer& renderer);
 
     // Возвращает информацию о маршруте (запрос Bus)
@@ -40,7 +38,7 @@ public:
         return renderer_.GenerateMap(db_);
     }
 
-    void SetRouter(const std::shared_ptr<routing::TransportRouter>& router);
+    void SetRouter(const routing::TransportRouter& router);
     std::optional<routing::RouteData> GetRoute(std::string_view from_stop, std::string_view to_stop) const;
 
 
@@ -48,6 +46,6 @@ private:
     // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
     const catalogue::TransportCatalogue& db_;
     renderer::MapRenderer& renderer_;
-    std::shared_ptr<routing::TransportRouter> router_;
+    std::optional<routing::TransportRouter> router_;
 
 };
