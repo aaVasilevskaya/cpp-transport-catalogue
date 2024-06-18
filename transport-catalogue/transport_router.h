@@ -18,7 +18,7 @@ using Weight = double;
 struct Settings{
     double bus_wait_time = 0;
     int bus_velocity = 0;// km/h
-    double GetVelosityMetersPerMinut(){
+    double GetVelocityMetersPerMinut(){
         return bus_velocity * 1000.0 / 60;
     }
 };
